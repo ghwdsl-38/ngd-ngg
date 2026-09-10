@@ -84,4 +84,4 @@ sha256sum -c topology-agent-linux-amd64.sha256
 ./topology-agent-linux-amd64 --help
 ```
 
-本次构建校验：`2932130b7dd7828cbeca4d675d5db08b13b60d77d835b997ba850071b0dcc23c`。
+本次构建校验：`8ae21a894d3fa2102dd7486d42d82ab8bbe82944212adef67c6a5a1c6b6d15d5`。

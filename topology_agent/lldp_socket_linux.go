@@ -12,10 +12,17 @@ import (
 	"golang.org/x/sys/unix"
 )
 
+var lldpMulticastAddresses = [][6]byte{
+	{0x01, 0x80, 0xc2, 0x00, 0x00, 0x00},
+	{0x01, 0x80, 0xc2, 0x00, 0x00, 0x03},
+	{0x01, 0x80, 0xc2, 0x00, 0x00, 0x0e},
+}
+
 func receiveLLDPOnHost(ctx context.Context, selections map[string]interfaceSelection, bindSingle bool, timeout time.Duration, count int) (result []lldpNeighbor, returnErr error) {
 	started := time.Now()
 	allowed := make(map[string]struct{}, len(selections))
 	candidates := make(map[int]interfaceSelection, len(selections))
+	captureInterfaces := make(map[string]*net.Interface, len(selections))
 	for name, selection := range selections {
 		allowed[name] = struct{}{}
 		iface, err := net.InterfaceByName(name)
@@ -24,6 +31,7 @@ func receiveLLDPOnHost(ctx context.Context, selections map[string]interfaceSelec
 		}
 		selection.Index = iface.Index
 		candidates[iface.Index] = selection
+		captureInterfaces[name] = iface
 	}
 	allowedNames := sortedInterfaceSet(allowed)
 	log.Printf("[LLDP-AGENT] ENTER receiveLLDP interfaces=%v bindSingle=%t timeout=%s count=%d", allowedNames, bindSingle, timeout, count)
@@ -41,13 +49,15 @@ func receiveLLDPOnHost(ctx context.Context, selections map[string]interfaceSelec
 	}
 	defer unix.Close(fd)
 	log.Printf("[LLDP-AGENT] RETURN unix.Socket fd=%d", fd)
+	for _, name := range allowedNames {
+		if err := subscribeLLDPMulticast(fd, captureInterfaces[name]); err != nil {
+			return nil, err
+		}
+	}
 
 	// Bind one explicit interface, including a Bond master.
 	if bindSingle && len(selections) == 1 {
-		iface, err := net.InterfaceByName(allowedNames[0])
-		if err != nil {
-			return nil, fmt.Errorf("resolve selected interface %q: %w", allowedNames[0], err)
-		}
+		iface := captureInterfaces[allowedNames[0]]
 		address := &unix.SockaddrLinklayer{Protocol: htons(ethernetProtocolLLDP), Ifindex: iface.Index}
 		log.Printf("[LLDP-AGENT] CALL unix.Bind interface=%s ifindex=%d", iface.Name, iface.Index)
 		if err := unix.Bind(fd, address); err != nil {
@@ -139,4 +149,22 @@ func receiveLLDPOnHost(ctx context.Context, selections map[string]interfaceSelec
 	sortNeighbors(result)
 	log.Printf("[LLDP-AGENT] COLLECTION COMPLETE reason=%s collectionMode=%s validFrames=%d uniqueNeighbors=%d distinctLeaves=%d maxUniqueNeighbors=%d", stopReason, collectionMode(count), validFrames, len(result), distinctLeafCount(result), count)
 	return result, nil
+}
+
+func subscribeLLDPMulticast(fd int, iface *net.Interface) error {
+	for _, address := range lldpMulticastAddresses {
+		request := &unix.PacketMreq{
+			Ifindex: int32(iface.Index),
+			Type:    unix.PACKET_MR_MULTICAST,
+			Alen:    uint16(len(address)),
+		}
+		copy(request.Address[:], address[:])
+		mac := net.HardwareAddr(address[:]).String()
+		log.Printf("[LLDP-AGENT] CALL unix.SetsockoptPacketMreq interface=%s ifindex=%d multicast=%s", iface.Name, iface.Index, mac)
+		if err := unix.SetsockoptPacketMreq(fd, unix.SOL_PACKET, unix.PACKET_ADD_MEMBERSHIP, request); err != nil {
+			return fmt.Errorf("subscribe interface %q to LLDP multicast %s: %w", iface.Name, mac, err)
+		}
+		log.Printf("[LLDP-AGENT] RETURN unix.SetsockoptPacketMreq status=success interface=%s multicast=%s", iface.Name, mac)
+	}
+	return nil
 }

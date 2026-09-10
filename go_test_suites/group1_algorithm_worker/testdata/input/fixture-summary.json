@@ -1,0 +1,6 @@
+{
+  "metricNamesPerNode": 14,
+  "metricSamples": 14000,
+  "nodeCount": 1000,
+  "topology": "华北 / 怀来 / HB-HL-DC1 / 102机房 / 4 Border Domain / 50 Leaf / 20 Node per Leaf; SPINE empty"
+}

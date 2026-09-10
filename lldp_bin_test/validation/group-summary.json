@@ -1,0 +1,44 @@
+﻿[
+    {
+        "group":  1,
+        "exitCode":  0,
+        "status":  "PASS",
+        "elapsedSeconds":  10.175,
+        "log":  "D:\\project\\ngd-ngg\\go_test_suites\\results\\local-20260910-160439-607\\group1.log"
+    },
+    {
+        "group":  2,
+        "exitCode":  0,
+        "status":  "PASS",
+        "elapsedSeconds":  3.941,
+        "log":  "D:\\project\\ngd-ngg\\go_test_suites\\results\\local-20260910-160439-607\\group2.log"
+    },
+    {
+        "group":  3,
+        "exitCode":  0,
+        "status":  "PASS",
+        "elapsedSeconds":  10.2,
+        "log":  "D:\\project\\ngd-ngg\\go_test_suites\\results\\local-20260910-160439-607\\group3.log"
+    },
+    {
+        "group":  4,
+        "exitCode":  0,
+        "status":  "PASS",
+        "elapsedSeconds":  9.211,
+        "log":  "D:\\project\\ngd-ngg\\go_test_suites\\results\\local-20260910-160439-607\\group4.log"
+    },
+    {
+        "group":  5,
+        "exitCode":  0,
+        "status":  "PASS",
+        "elapsedSeconds":  11.675,
+        "log":  "D:\\project\\ngd-ngg\\go_test_suites\\results\\local-20260910-160439-607\\group5.log"
+    },
+    {
+        "group":  7,
+        "exitCode":  0,
+        "status":  "PASS",
+        "elapsedSeconds":  26.25,
+        "log":  "D:\\project\\ngd-ngg\\go_test_suites\\results\\local-20260910-160439-607\\group7.log"
+    }
+]

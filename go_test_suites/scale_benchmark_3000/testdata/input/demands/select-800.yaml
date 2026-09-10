@@ -1,0 +1,18 @@
+apiVersion: scheduling.platform.example.io/v1alpha1
+kind: NodeGroupDemand
+metadata:
+  labels:
+    scheduling.platform.example.io/scheduler: volcano
+  name: benchmark-select-800
+spec:
+  maxNodes: 800
+  minResources:
+    cpu: "25600"
+    memory: 102400Gi
+  nodeSelector:
+    matchLabels:
+      tests.ngg.io/worker: "true"
+  quota:
+    cpu: "25600"
+    memory: 102400Gi
+  schedulerName: volcano

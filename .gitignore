@@ -1,0 +1,27 @@
+.cache/
+.vscode/
+build/
+images/*
+!images/.gitkeep
+!images/README.md
+image_validation/results/*
+!image_validation/results/.gitkeep
+results/*
+!results/.gitkeep
+__pycache__/
+*.pyc
+.coverage
+coverage.out
+coverage.html
+debug.test*
+test_suites/**/runs/*
+!test_suites/**/runs/.gitkeep
+
+# Local cluster access and locally built LLDP binaries.
+config-bupt.yaml
+lldp-node-labeler
+lldp_bin_test/topology-agent-linux-amd64
+lldp_bin_test/previous/
+
+go_test_suites/results/
+go_test_suites/**/results/
